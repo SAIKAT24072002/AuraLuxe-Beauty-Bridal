@@ -14,6 +14,10 @@ import publicRoutes from "./routes/publicRoutes.js";
 
 const app = express();
 
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(
   cors({
     origin(origin, callback) {
