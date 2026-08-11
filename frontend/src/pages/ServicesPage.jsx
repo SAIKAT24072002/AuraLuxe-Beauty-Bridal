@@ -28,14 +28,14 @@ export default function ServicesPage() {
       <PageHero
         eyebrow="Services"
         title="Premium beauty services presented with calm hierarchy and booking-ready clarity."
-        description="Search, filter, compare durations, and explore polished service cards designed to transition cleanly into live booking flows later."
+        description="Search, filter, compare durations, and explore polished service cards designed to move smoothly into your booking journey."
       />
 
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <SectionHeader
           eyebrow="Discover"
           title="Search and filter without losing the premium feel."
-          description="Service listing now loads from backend APIs and keeps a clean fallback when MongoDB is not configured."
+          description="Browse services by category, compare timing, and find the right appointment without losing the calm editorial feel."
         />
 
         <div className="mt-10 rounded-[2rem] border border-rosewood/10 bg-white p-5 shadow-panel">

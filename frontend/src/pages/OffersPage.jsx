@@ -20,7 +20,7 @@ export default function OffersPage() {
           description="Copy the code, check eligibility, and move straight into beauty or bridal booking without guesswork."
         />
         {offers.length ? (
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          <div className="mt-10 grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
             {offers.map((offer) => (
               <OfferCard key={offer.id} offer={offer} />
             ))}

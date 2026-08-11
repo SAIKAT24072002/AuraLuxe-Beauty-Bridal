@@ -122,7 +122,7 @@ export default function HomePage() {
         <SectionHeader
           eyebrow="Popular Services"
           title="Rituals that feel elevated before the appointment even begins."
-          description="Premium cards, calm spacing, and pricing clarity make discovery feel polished while staying ready for later API-powered booking flows."
+          description="Premium cards, calm spacing, and clear pricing help you choose services with confidence."
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {popularServices.map((service) => (
@@ -170,7 +170,7 @@ export default function HomePage() {
         <SectionHeader
           eyebrow="Featured Packages"
           title="Signature bridal packages prepared for parlour, home, and venue bookings."
-          description="Structured for detail pages, booking forms, payment summaries, and later track-booking integration."
+          description="Designed for wedding mornings, venue preparation, and a polished bridal experience from start to finish."
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           {featuredPackages.map((item) => (
@@ -194,7 +194,7 @@ export default function HomePage() {
               "At Beauty Parlour",
               "At Bride's Home",
               "At Wedding Venue",
-              "Address & timing capture UI ready",
+              "Coordinated arrival timing and address support",
             ].map((item) => (
               <div key={item} className="rounded-[1.5rem] bg-white/70 p-5">
                 <Check size={18} className="text-rosewood" />
@@ -240,9 +240,9 @@ export default function HomePage() {
         <SectionHeader
           eyebrow="Current Offers"
           title="Offers presented with strong hierarchy and easy coupon visibility."
-          description="Built for admin-managed promotions later, but already shaped to feel campaign-ready."
+          description="Seasonal savings and bridal offers stay easy to read, copy, and apply while booking."
         />
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
           {offers.map((offer) => (
             <OfferCard key={offer.id} offer={offer} />
           ))}

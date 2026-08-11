@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ensurePrimarySuperAdmin } from "../services/adminBootstrapService.js";
 
 let databaseConnected = false;
 let lastConnectionError = null;
@@ -17,6 +18,7 @@ export async function connectDatabase() {
     const connection = await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 10000,
     });
+    await ensurePrimarySuperAdmin();
     databaseConnected = true;
     lastConnectionError = null;
     console.log(`MongoDB connected to database "${connection.connection.name}".`);

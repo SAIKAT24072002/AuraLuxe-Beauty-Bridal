@@ -252,9 +252,58 @@ export const bookingApiService = {
     return response.data;
   },
 
+  async changeAdminPassword(token, payload) {
+    const response = await apiClient.post("/auth/admin/change-password", payload, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
   async getAdminAppointments(token, params) {
     const response = await apiClient.get("/admin/appointments", {
       params,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
+  async getAdminAccounts(token) {
+    const response = await apiClient.get("/admin/admins", {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
+  async getAdminAuditLogs(token) {
+    const response = await apiClient.get("/admin/admins/audit-logs", {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
+  async createAdminAccount(token, payload) {
+    const response = await apiClient.post("/admin/admins", payload, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
+  async updateAdminAccount(token, id, payload) {
+    const response = await apiClient.put(`/admin/admins/${id}`, payload, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
+  async resetAdminAccountPassword(token, id, payload) {
+    const response = await apiClient.post(`/admin/admins/${id}/reset-password`, payload, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    return response.data;
+  },
+
+  async deleteAdminAccount(token, id) {
+    const response = await apiClient.delete(`/admin/admins/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
     return response.data;

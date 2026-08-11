@@ -3,7 +3,7 @@ import { optimizeCloudinaryImage } from "../utils/media";
 
 export default function BridalPackageCard({ item }) {
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-rosewood/10 bg-white shadow-panel">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-rosewood/10 bg-white shadow-panel">
       <div className="relative h-72 overflow-hidden">
         <img
           src={optimizeCloudinaryImage(item.image, { width: 1100, height: 760, crop: "fill" })}
@@ -16,8 +16,8 @@ export default function BridalPackageCard({ item }) {
           </span>
         )}
       </div>
-      <div className="space-y-4 p-6">
-        <div>
+      <div className="flex flex-1 flex-col space-y-4 p-6">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.3em] text-rosewood">{item.duration}</p>
           <h3 className="mt-2 font-display text-3xl">{item.name}</h3>
           <p className="mt-2 text-sm leading-6 text-charcoal/70">{item.description}</p>
@@ -42,7 +42,7 @@ export default function BridalPackageCard({ item }) {
         </div>
         <Link
           to={`/bridal/packages/${item.slug}`}
-          className="inline-flex rounded-full bg-charcoal px-5 py-3 text-sm font-semibold text-white transition hover:bg-rosewood"
+          className="mt-auto inline-flex w-fit rounded-full bg-charcoal px-5 py-3 text-sm font-semibold text-white transition hover:bg-rosewood"
         >
           View Package
         </Link>

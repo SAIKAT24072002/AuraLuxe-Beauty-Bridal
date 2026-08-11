@@ -45,3 +45,14 @@ export const protectAdmin = asyncHandler(async (req, _res, next) => {
   req.admin = admin;
   next();
 });
+
+export const requireAdmin = protectAdmin;
+
+export function requireSuperAdmin(req, _res, next) {
+  if (req.admin?.role !== "SUPER_ADMIN") {
+    next(new ApiError(403, "Super admin access is required."));
+    return;
+  }
+
+  next();
+}

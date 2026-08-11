@@ -11,7 +11,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Contact"
         title="A premium contact space for appointments, bridal consultations, and venue conversations."
-        description="The UI is ready for dynamic business details, contact form submission, and map embed integration without blocking current design work."
+        description="Reach out for salon visits, home service planning, bridal consultations, and venue coordination with one calm, polished contact flow."
       />
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
@@ -40,7 +40,7 @@ export default function ContactPage() {
 
           <div className="space-y-6">
             <div className="rounded-[2rem] border border-rosewood/10 bg-white p-6 shadow-panel">
-              <h2 className="font-display text-4xl">Contact Form UI</h2>
+              <h2 className="font-display text-4xl">Send Us a Message</h2>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 <input className="rounded-2xl border border-rosewood/15 bg-porcelain px-4 py-3 outline-none" placeholder="Full name" />
                 <input className="rounded-2xl border border-rosewood/15 bg-porcelain px-4 py-3 outline-none" placeholder="Phone number" />
@@ -67,9 +67,9 @@ export default function ContactPage() {
               </div>
               <div className="rounded-[2rem] border border-rosewood/10 bg-gradient-to-br from-almond to-cream p-6 shadow-panel">
                 <p className="text-xs uppercase tracking-[0.3em] text-rosewood">Location</p>
-                <p className="mt-4 font-display text-3xl">Map Embed Placeholder</p>
+                <p className="mt-4 font-display text-3xl">Visit Our Studio</p>
                 <p className="mt-3 text-sm leading-6 text-charcoal/70">
-                  Ready for Google Maps embed from admin settings in a later phase.
+                  Use the address above for salon visits, or share your venue details when booking on-location bridal support.
                 </p>
               </div>
             </div>

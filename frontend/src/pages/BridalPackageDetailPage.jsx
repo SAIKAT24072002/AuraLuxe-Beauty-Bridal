@@ -56,8 +56,8 @@ export default function BridalPackageDetailPage() {
       />
 
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr]">
-          <div className="space-y-6">
+        <div className="grid gap-8 xl:grid-cols-[minmax(0,0.95fr)_minmax(620px,1.05fr)]">
+          <div className="min-w-0 space-y-6">
             <div className="overflow-hidden rounded-[2rem] border border-rosewood/10 bg-white shadow-panel">
               <img
                 src={optimizeCloudinaryImage(item.image, { width: 1400, height: 1000, crop: "fill" })}
@@ -81,11 +81,24 @@ export default function BridalPackageDetailPage() {
                 ))}
               </div>
             ) : null}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                ["Offer Price", `Rs ${item.discountPrice.toLocaleString("en-IN")}`],
+                ["Duration", item.duration],
+                ["Advance", `${item.advancePercentage}%`],
+                ["Venue Support", item.venueService ? "Available" : "No"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-[1.6rem] border border-rosewood/10 bg-white p-5 shadow-panel">
+                  <p className="text-xs uppercase tracking-[0.25em] text-rosewood">{label}</p>
+                  <p className="mt-3 text-lg font-semibold text-charcoal">{value}</p>
+                </div>
+              ))}
+            </div>
             <div className="rounded-[2rem] border border-rosewood/10 bg-white p-6 shadow-panel">
               <SectionHeader
                 eyebrow="Included Services"
                 title="Everything packaged into one graceful bridal preparation flow."
-                description="The detail page is designed for package storytelling, inclusions, pricing, and future gallery integration."
+                description="Every inclusion is selected to keep the bridal morning smooth, elegant, and beautifully coordinated."
               />
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {item.includes.map((feature) => (
@@ -98,29 +111,7 @@ export default function BridalPackageDetailPage() {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="rounded-[2rem] border border-rosewood/10 bg-charcoal p-6 text-white shadow-panel">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/55">Package Summary</p>
-              <h2 className="mt-4 font-display text-4xl">{item.tagline}</h2>
-              <div className="mt-6 space-y-4 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-white/65">Offer Price</span>
-                  <span className="font-semibold">Rs {item.discountPrice.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/65">Duration</span>
-                  <span className="font-semibold">{item.duration}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/65">Advance</span>
-                  <span className="font-semibold">{item.advancePercentage}%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/65">Venue Support</span>
-                  <span className="font-semibold">{item.venueService ? "Available" : "No"}</span>
-                </div>
-              </div>
-            </div>
+          <div className="min-w-0">
             <BridalBookingPanel bridalPackages={bridalPackages} initialPackage={item} />
           </div>
         </div>

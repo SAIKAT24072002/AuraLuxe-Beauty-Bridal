@@ -15,7 +15,7 @@ export default function GalleryPage() {
       <PageHero
         eyebrow="Gallery"
         title="A premium visual grid for bridal, glam, hair, nails, and before-after stories."
-        description="The gallery preview uses temporary data now, but the architecture is ready for Cloudinary-backed API content later."
+        description="Browse editorial bridal looks, polished glam finishes, and service transformations in a gallery designed to stay calm, rich, and easy to explore."
       />
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <SectionHeader
@@ -46,4 +46,3 @@ export default function GalleryPage() {
     </div>
   );
 }
-

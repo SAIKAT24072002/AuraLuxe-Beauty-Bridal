@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  changeAdminPassword,
   getAdminProfile,
   loginAdmin,
   logoutAdmin,
@@ -8,6 +9,7 @@ import {
 import { protectAdmin } from "../middleware/authMiddleware.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 import {
+  adminChangePasswordSchema,
   adminLoginSchema,
   adminSetupSchema,
 } from "../validators/authValidators.js";
@@ -18,5 +20,11 @@ router.post("/setup", validateRequest(adminSetupSchema), setupInitialAdmin);
 router.post("/login", validateRequest(adminLoginSchema), loginAdmin);
 router.post("/logout", protectAdmin, logoutAdmin);
 router.get("/me", protectAdmin, getAdminProfile);
+router.post(
+  "/change-password",
+  protectAdmin,
+  validateRequest(adminChangePasswordSchema),
+  changeAdminPassword
+);
 
 export default router;

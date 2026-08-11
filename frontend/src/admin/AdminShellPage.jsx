@@ -133,6 +133,21 @@ const emptyTestimonialForm = {
   isActive: true,
 };
 
+const emptyAdminForm = {
+  name: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+  role: "ADMIN",
+  isActive: true,
+};
+
+const emptyAdminResetForm = {
+  newPassword: "",
+  confirmPassword: "",
+};
+
 function formatCurrency(value) {
   return `Rs ${Number(value || 0).toLocaleString("en-IN")}`;
 }
@@ -422,6 +437,8 @@ export default function AdminShellPage() {
   const [messages, setMessages] = useState([]);
   const [settings, setSettings] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [admins, setAdmins] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
   const [filters, setFilters] = useState({
     search: "",
     bookingStatus: "",
@@ -433,6 +450,18 @@ export default function AdminShellPage() {
   const [confirmState, setConfirmState] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [uploadingAsset, setUploadingAsset] = useState("");
+  const [securityForm, setSecurityForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [securityState, setSecurityState] = useState({
+    loading: false,
+    error: "",
+    notice: "",
+  });
+
+  const isSuperAdmin = profile?.role === "SUPER_ADMIN";
 
   useEffect(() => {
     if (!token) {
@@ -448,6 +477,16 @@ export default function AdminShellPage() {
     loadAll(token, true);
     loadProfile(token);
   }, [token]);
+
+  useEffect(() => {
+    if (!token || !isSuperAdmin) {
+      setAdmins([]);
+      setAuditLogs([]);
+      return;
+    }
+
+    loadAdminSecurityData(token);
+  }, [token, isSuperAdmin]);
 
   useEffect(() => {
     let socket;
@@ -481,6 +520,22 @@ export default function AdminShellPage() {
       setProfile(response.data);
     } catch {
       setProfile(null);
+    }
+  }
+
+  async function loadAdminSecurityData(activeToken) {
+    try {
+      const [adminResponse, auditResponse] = await Promise.all([
+        bookingApiService.getAdminAccounts(activeToken),
+        bookingApiService.getAdminAuditLogs(activeToken),
+      ]);
+      setAdmins(adminResponse.data || []);
+      setAuditLogs(auditResponse.data || []);
+    } catch (error) {
+      setState((current) => ({
+        ...current,
+        error: error.response?.data?.message || "Admin security data could not be loaded right now.",
+      }));
     }
   }
 
@@ -577,6 +632,8 @@ export default function AdminShellPage() {
       gallery: payload || emptyGalleryForm,
       testimonial: payload || emptyTestimonialForm,
       settings: payload || settings || {},
+      admin: payload || emptyAdminForm,
+      adminPassword: payload || emptyAdminResetForm,
     };
     setModal({ kind, form: formMap[kind] });
   }
@@ -832,14 +889,47 @@ export default function AdminShellPage() {
         };
         await bookingApiService.updateAdminSiteSettings(token, payload);
       }
+      if (modal.kind === "admin") {
+        const payload = {
+          name: modal.form.name,
+          email: modal.form.email,
+          phone: modal.form.phone || undefined,
+          role: modal.form.role || "ADMIN",
+          isActive: Boolean(modal.form.isActive),
+        };
+
+        if (modal.form.id) {
+          await bookingApiService.updateAdminAccount(token, modal.form.id, payload);
+        } else {
+          if (modal.form.password !== modal.form.confirmPassword) {
+            throw new Error("Password confirmation does not match.");
+          }
+          await bookingApiService.createAdminAccount(token, {
+            ...payload,
+            password: modal.form.password,
+          });
+        }
+      }
+      if (modal.kind === "adminPassword") {
+        if (modal.form.newPassword !== modal.form.confirmPassword) {
+          throw new Error("Password confirmation does not match.");
+        }
+        await bookingApiService.resetAdminAccountPassword(token, modal.form.id, {
+          newPassword: modal.form.newPassword,
+          confirmPassword: modal.form.confirmPassword,
+        });
+      }
 
       closeModal();
       showNotice("Changes saved successfully.");
       await loadAll(token, false);
+      if (isSuperAdmin) {
+        await loadAdminSecurityData(token);
+      }
     } catch (error) {
       setState((current) => ({
         ...current,
-        error: error.response?.data?.message || "Save failed.",
+        error: error.response?.data?.message || error.message || "Save failed.",
       }));
     } finally {
       setSubmitting(false);
@@ -866,8 +956,12 @@ export default function AdminShellPage() {
       if (kind === "gallery") await bookingApiService.deleteAdminGallery(token, id);
       if (kind === "testimonial") await bookingApiService.deleteAdminTestimonial(token, id);
       if (kind === "message") await bookingApiService.deleteAdminMessage(token, id);
+      if (kind === "admin") await bookingApiService.deleteAdminAccount(token, id);
       showNotice("Item removed successfully.");
       await loadAll(token, false);
+      if (isSuperAdmin) {
+        await loadAdminSecurityData(token);
+      }
     } catch (error) {
       setState((current) => ({
         ...current,
@@ -904,6 +998,30 @@ export default function AdminShellPage() {
     if (!token) return;
     await bookingApiService.markAllAdminNotificationsRead(token);
     await loadAll(token, false);
+  }
+
+  async function handleOwnPasswordChange(event) {
+    event.preventDefault();
+    if (!token) return;
+
+    setSecurityState({ loading: true, error: "", notice: "" });
+    try {
+      const response = await bookingApiService.changeAdminPassword(token, securityForm);
+      setSecurityForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setSecurityState({
+        loading: false,
+        error: "",
+        notice: response.message || "Password changed successfully. Please log in again.",
+      });
+      setToken("");
+      setProfile(null);
+    } catch (error) {
+      setSecurityState({
+        loading: false,
+        error: error.response?.data?.message || "Password could not be changed.",
+        notice: "",
+      });
+    }
   }
 
   const filteredAppointments = useMemo(() => {
@@ -966,6 +1084,11 @@ export default function AdminShellPage() {
               <p className="text-xs uppercase tracking-[0.3em]">Secure Admin Login</p>
             </div>
             <div className="mt-6 grid gap-4">
+              {securityState.notice ? (
+                <div className="rounded-[1.2rem] bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {securityState.notice}
+                </div>
+              ) : null}
               <TextInput
                 value={loginForm.email}
                 onChange={(event) =>
@@ -1732,9 +1855,9 @@ export default function AdminShellPage() {
                   </Panel>
                 ) : null}
 
-                {["content", "settings"].includes(activeSection) ? (
+                {activeSection === "content" ? (
                   <Panel
-                    title={activeSection === "content" ? "Website Content" : "Settings"}
+                    title="Website Content"
                     description="Update business info, hero copy, contact details, business hours, social links, booking rules, and website text."
                     actions={
                       <button
@@ -1781,6 +1904,296 @@ export default function AdminShellPage() {
                       ))}
                     </div>
                   </Panel>
+                ) : null}
+
+                {activeSection === "settings" ? (
+                  <div className="space-y-6">
+                    <Panel
+                      title="Security"
+                      description="Change your own password, review your access level, and keep the admin workspace secure."
+                    >
+                      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+                        <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
+                          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Signed In Account</p>
+                          <div className="mt-4 space-y-3 text-sm text-slate-700">
+                            <p><span className="font-semibold text-slate-900">Name:</span> {profile?.name || "--"}</p>
+                            <p><span className="font-semibold text-slate-900">Email:</span> {profile?.email || "--"}</p>
+                            <p><span className="font-semibold text-slate-900">Role:</span> {profile?.role || "--"}</p>
+                          </div>
+                        </div>
+
+                        <form onSubmit={handleOwnPasswordChange} className="grid gap-4 md:grid-cols-2">
+                          <Field label="Current Password">
+                            <TextInput
+                              type="password"
+                              value={securityForm.currentPassword}
+                              onChange={(event) =>
+                                setSecurityForm((current) => ({
+                                  ...current,
+                                  currentPassword: event.target.value,
+                                }))
+                              }
+                            />
+                          </Field>
+                          <div />
+                          <Field label="New Password">
+                            <TextInput
+                              type="password"
+                              value={securityForm.newPassword}
+                              onChange={(event) =>
+                                setSecurityForm((current) => ({
+                                  ...current,
+                                  newPassword: event.target.value,
+                                }))
+                              }
+                            />
+                          </Field>
+                          <Field label="Confirm Password">
+                            <TextInput
+                              type="password"
+                              value={securityForm.confirmPassword}
+                              onChange={(event) =>
+                                setSecurityForm((current) => ({
+                                  ...current,
+                                  confirmPassword: event.target.value,
+                                }))
+                              }
+                            />
+                          </Field>
+                          {securityState.error ? (
+                            <div className="rounded-[1.2rem] bg-red-50 px-4 py-3 text-sm text-red-700 md:col-span-2">
+                              {securityState.error}
+                            </div>
+                          ) : null}
+                          <div className="md:col-span-2">
+                            <button
+                              type="submit"
+                              disabled={securityState.loading}
+                              className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                            >
+                              {securityState.loading ? "Updating..." : "Change Password"}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </Panel>
+
+                    {isSuperAdmin ? (
+                      <Panel
+                        title="Admin Management"
+                        description="Create and manage admin accounts with strict SUPER_ADMIN-only access controls."
+                        actions={
+                          <button
+                            type="button"
+                            onClick={() => openModal("admin", emptyAdminForm)}
+                            className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+                          >
+                            Create Admin
+                          </button>
+                        }
+                      >
+                        <DesktopTable
+                          headers={["Name", "Email", "Role", "Status", "Last Login", "Actions"]}
+                          rows={admins.map((item) => (
+                            <tr key={item.id} className="border-b border-slate-100 align-top">
+                              <td className="py-4 pr-6">
+                                <p className="font-semibold text-slate-900">{item.name}</p>
+                                <p className="mt-1 text-xs text-slate-500">{item.phone || "No phone"}</p>
+                              </td>
+                              <td className="py-4 pr-6 text-slate-700">{item.email}</td>
+                              <td className="py-4 pr-6">
+                                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                                  {item.role}
+                                </span>
+                              </td>
+                              <td className="py-4 pr-6">
+                                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${item.isActive ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-800"}`}>
+                                  {item.isActive ? "Active" : "Inactive"}
+                                </span>
+                              </td>
+                              <td className="py-4 pr-6 text-slate-600">{formatDateTime(item.lastLoginAt)}</td>
+                              <td className="py-4">
+                                <div className="flex flex-wrap gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      openModal("admin", {
+                                        ...item,
+                                        password: "",
+                                        confirmPassword: "",
+                                      })
+                                    }
+                                    className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      openModal("adminPassword", {
+                                        id: item.id,
+                                        name: item.name,
+                                        newPassword: "",
+                                        confirmPassword: "",
+                                      })
+                                    }
+                                    className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700"
+                                  >
+                                    Reset Password
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      askDelete(item.email, () => handleDelete("admin", item.id))
+                                    }
+                                    className="rounded-full bg-slate-950 px-3 py-2 text-xs font-semibold text-white"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        />
+
+                        <MobileCards
+                          items={admins}
+                          render={(item) => (
+                            <div key={item.id} className="rounded-[1.4rem] border border-slate-200 bg-slate-50 p-4">
+                              <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                  <p className="font-semibold text-slate-900">{item.name}</p>
+                                  <p className="mt-1 text-sm text-slate-500">{item.email}</p>
+                                </div>
+                                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700">
+                                  {item.role}
+                                </span>
+                              </div>
+                              <p className="mt-3 text-sm text-slate-600">
+                                {item.isActive ? "Active" : "Inactive"} · Last login {formatDateTime(item.lastLoginAt)}
+                              </p>
+                              <div className="mt-4 flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openModal("admin", {
+                                      ...item,
+                                      password: "",
+                                      confirmPassword: "",
+                                    })
+                                  }
+                                  className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openModal("adminPassword", {
+                                      id: item.id,
+                                      name: item.name,
+                                      newPassword: "",
+                                      confirmPassword: "",
+                                    })
+                                  }
+                                  className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700"
+                                >
+                                  Reset Password
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => askDelete(item.email, () => handleDelete("admin", item.id))}
+                                  className="rounded-full bg-slate-950 px-3 py-2 text-xs font-semibold text-white"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        />
+                      </Panel>
+                    ) : null}
+
+                    {isSuperAdmin ? (
+                      <Panel
+                        title="Admin Audit Log"
+                        description="Security-sensitive admin actions are recorded here without storing password values or secrets."
+                      >
+                        <div className="grid gap-4">
+                          {auditLogs.length ? auditLogs.map((item) => (
+                            <article key={item.id} className="rounded-[1.4rem] border border-slate-200 bg-slate-50 p-4">
+                              <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                  <p className="font-semibold text-slate-900">{item.action}</p>
+                                  <p className="mt-1 text-sm text-slate-600">{item.description}</p>
+                                </div>
+                                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                                  {formatDateTime(item.createdAt)}
+                                </p>
+                              </div>
+                              <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
+                                <span>Actor: {item.actorAdmin?.email || "--"}</span>
+                                <span>Target: {item.targetAdmin?.email || "--"}</span>
+                              </div>
+                            </article>
+                          )) : (
+                            <div className="rounded-[1.4rem] border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500">
+                              No admin audit entries recorded yet.
+                            </div>
+                          )}
+                        </div>
+                      </Panel>
+                    ) : null}
+
+                    <Panel
+                      title="Business Settings"
+                      description="Website content, contact details, and business-wide defaults remain editable here."
+                      actions={
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openModal("settings", {
+                              ...(settings || {}),
+                              openingHoursText: (settings?.openingHours || [])
+                                .map((item) =>
+                                  item.isClosed
+                                    ? `${item.day}: Closed`
+                                    : `${item.day}: ${item.open || ""} - ${item.close || ""}`
+                                )
+                                .join("\n"),
+                              whyChooseUsText: (settings?.whyChooseUs || []).join("\n"),
+                              trackTimelineText: (settings?.trackTimeline || []).join("\n"),
+                              statsText: (settings?.stats || [])
+                                .map((item) => `${item.label}: ${item.value}`)
+                                .join("\n"),
+                            })
+                          }
+                          className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+                        >
+                          Edit Content
+                        </button>
+                      }
+                    >
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {[
+                          ["Business Name", settings?.businessName],
+                          ["Phone", settings?.phone],
+                          ["WhatsApp", settings?.whatsapp],
+                          ["Email", settings?.email],
+                          ["Address", settings?.address],
+                          ["Razorpay Status", "Configured / Not Configured via backend env only"],
+                          ["Booking Notice", settings?.bookingNoticePeriod || "--"],
+                          ["Default Advance %", settings?.defaultAdvancePercentage || "--"],
+                          ["Footer Text", settings?.footerText || "--"],
+                        ].map(([label, value]) => (
+                          <div key={label} className="rounded-[1.4rem] bg-slate-50 p-4">
+                            <p className="text-xs uppercase tracking-[0.25em] text-slate-500">{label}</p>
+                            <p className="mt-2 text-sm font-medium text-slate-800">{value || "--"}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Panel>
+                  </div>
                 ) : null}
               </div>
             ) : null}
@@ -2187,6 +2600,60 @@ export default function AdminShellPage() {
             <Field label="Booking Notice Period"><TextInput value={modal.form.bookingNoticePeriod || ""} onChange={(event) => updateModalForm("bookingNoticePeriod", event.target.value)} /></Field>
             <Field label="Default Advance Percentage"><TextInput type="number" value={modal.form.defaultAdvancePercentage || 50} onChange={(event) => updateModalForm("defaultAdvancePercentage", event.target.value)} /></Field>
             <Field label="Cancellation Policy"><TextArea rows="4" value={modal.form.cancellationPolicy || ""} onChange={(event) => updateModalForm("cancellationPolicy", event.target.value)} className="md:col-span-2" /></Field>
+          </div>
+        ) : null}
+
+        {modal?.kind === "admin" ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Admin Name">
+              <TextInput value={modal.form.name || ""} onChange={(event) => updateModalForm("name", event.target.value)} />
+            </Field>
+            <Field label="Admin Email">
+              <TextInput value={modal.form.email || ""} onChange={(event) => updateModalForm("email", event.target.value)} />
+            </Field>
+            <Field label="Phone">
+              <TextInput value={modal.form.phone || ""} onChange={(event) => updateModalForm("phone", event.target.value)} />
+            </Field>
+            <Field label="Role">
+              <Select value={modal.form.role || "ADMIN"} onChange={(event) => updateModalForm("role", event.target.value)}>
+                <option value="ADMIN">ADMIN</option>
+                <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+              </Select>
+            </Field>
+            <Field label="Status">
+              <Select value={String(modal.form.isActive ?? true)} onChange={(event) => updateModalForm("isActive", event.target.value === "true")}>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </Select>
+            </Field>
+            {!modal.form.id ? (
+              <>
+                <Field label="Password">
+                  <TextInput type="password" value={modal.form.password || ""} onChange={(event) => updateModalForm("password", event.target.value)} />
+                </Field>
+                <Field label="Confirm Password">
+                  <TextInput type="password" value={modal.form.confirmPassword || ""} onChange={(event) => updateModalForm("confirmPassword", event.target.value)} />
+                </Field>
+              </>
+            ) : (
+              <div className="rounded-[1.2rem] bg-slate-50 p-4 text-sm leading-6 text-slate-600 md:col-span-2">
+                Password changes are handled through the dedicated reset password action so hashes never appear in edit flows.
+              </div>
+            )}
+          </div>
+        ) : null}
+
+        {modal?.kind === "adminPassword" ? (
+          <div className="grid gap-4">
+            <div className="rounded-[1.2rem] bg-slate-50 p-4 text-sm text-slate-600">
+              Reset password for <span className="font-semibold text-slate-900">{modal.form.name || "this admin"}</span>.
+            </div>
+            <Field label="New Password">
+              <TextInput type="password" value={modal.form.newPassword || ""} onChange={(event) => updateModalForm("newPassword", event.target.value)} />
+            </Field>
+            <Field label="Confirm Password">
+              <TextInput type="password" value={modal.form.confirmPassword || ""} onChange={(event) => updateModalForm("confirmPassword", event.target.value)} />
+            </Field>
           </div>
         ) : null}
 

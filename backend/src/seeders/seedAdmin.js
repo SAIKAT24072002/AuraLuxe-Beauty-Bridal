@@ -33,6 +33,8 @@ async function seedAdmin() {
     email: ADMIN_SEED_EMAIL,
     password: ADMIN_SEED_PASSWORD,
     phone: ADMIN_SEED_PHONE,
+    role: "SUPER_ADMIN",
+    isActive: true,
   });
 
   console.log(`Admin created successfully: ${admin.email}`);
@@ -43,4 +45,3 @@ seedAdmin().catch((error) => {
   console.error("Admin seed failed:", error.message);
   process.exit(1);
 });
-

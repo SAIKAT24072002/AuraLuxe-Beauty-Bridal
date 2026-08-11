@@ -9,6 +9,7 @@ import contactRoutes from "./contactRoutes.js";
 import dashboardRoutes from "./dashboardRoutes.js";
 import galleryRoutes from "./galleryRoutes.js";
 import adminMediaRoutes from "./adminMediaRoutes.js";
+import adminAccountRoutes from "./adminAccountRoutes.js";
 import notificationRoutes from "./notificationRoutes.js";
 import offerRoutes from "./offerRoutes.js";
 import paymentRoutes from "./paymentRoutes.js";
@@ -19,6 +20,7 @@ import testimonialRoutes from "./testimonialRoutes.js";
 const router = Router();
 
 router.use(protectAdmin);
+router.use("/admins", adminAccountRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/services", serviceRoutes);

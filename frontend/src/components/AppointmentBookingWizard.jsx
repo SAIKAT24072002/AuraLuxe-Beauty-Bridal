@@ -349,7 +349,7 @@ export default function AppointmentBookingWizard({ service, onClose, onBookingCr
           <p className="text-xs uppercase tracking-[0.3em] text-rosewood">Beauty Booking Flow</p>
           <h3 className="mt-3 font-display text-4xl">{service.name}</h3>
           <p className="mt-2 text-sm leading-6 text-charcoal/68">
-            Live service, availability, booking creation, and Razorpay-ready advance payment.
+            Choose your date, preferred slot, and guest details before confirming a polished advance summary.
           </p>
         </div>
         <button
@@ -709,12 +709,11 @@ export default function AppointmentBookingWizard({ service, onClose, onBookingCr
             </div>
           </div>
 
-          <div className="mt-6 rounded-[1.4rem] border border-white/10 p-4 text-sm leading-6 text-white/70">
+              <div className="mt-6 rounded-[1.4rem] border border-white/10 p-4 text-sm leading-6 text-white/70">
             <div className="flex items-start gap-3">
               <ShieldAlert size={18} className="mt-1 text-blush" />
               <p>
-                Backend calculates total, advance, and remaining amounts. Frontend only opens
-                checkout against verified backend orders.
+                Final totals, advance amounts, and payment verification are always confirmed securely before checkout opens.
               </p>
             </div>
           </div>

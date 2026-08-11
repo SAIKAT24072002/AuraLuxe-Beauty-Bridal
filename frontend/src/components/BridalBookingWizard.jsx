@@ -412,8 +412,7 @@ export default function BridalBookingWizard({
             {selectedPackage?.name || "Premium bridal booking"}
           </h3>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-charcoal/68">
-            Real package selection, conflict-aware availability, premium venue form, and
-            Razorpay-ready advance payment architecture.
+            Choose your package, confirm the event schedule, and complete a polished bridal booking journey with clear payment guidance.
           </p>
         </div>
         <div className="rounded-full bg-blush/45 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-charcoal">
@@ -421,7 +420,7 @@ export default function BridalBookingWizard({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 md:grid-cols-6">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stepLabels.map((label, index) => (
           <div
             key={label}
@@ -438,16 +437,16 @@ export default function BridalBookingWizard({
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5">
+      <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)]">
+        <div className="min-w-0 space-y-5">
           {step === 0 && (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
               {bridalPackages.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedPackageId(item.id)}
-                  className={`rounded-[1.7rem] border p-5 text-left transition ${
+                  className={`flex min-w-0 flex-col rounded-[1.7rem] border p-5 text-left transition ${
                     selectedPackageId === item.id
                       ? "border-charcoal bg-charcoal text-white"
                       : "border-rosewood/10 bg-porcelain hover:border-rosewood"
@@ -461,9 +460,9 @@ export default function BridalBookingWizard({
                       </span>
                     )}
                   </div>
-                  <p className="mt-5 font-display text-2xl">{item.name}</p>
-                  <p className="mt-3 text-sm leading-6 opacity-80">{item.tagline}</p>
-                  <div className="mt-5 flex items-center justify-between gap-4 text-sm">
+                  <p className="mt-5 font-display text-2xl leading-tight">{item.name}</p>
+                  <p className="mt-3 flex-1 text-sm leading-6 opacity-80">{item.tagline}</p>
+                  <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 text-sm">
                     <span>{item.duration}</span>
                     <span className="font-semibold">
                       {formatCurrency(item.discountPrice || item.price)}
@@ -529,8 +528,7 @@ export default function BridalBookingWizard({
                 </label>
               )}
               <div className="rounded-[1.6rem] bg-cream p-5 text-sm leading-6 text-charcoal/72 md:col-span-2">
-                Choose the bridal event and date first. Available start times are loaded live
-                from the backend to prevent conflicting artist schedules.
+                Choose the bridal event and date first so available artist start times can be prepared around your celebration.
               </div>
             </div>
           )}
@@ -854,26 +852,26 @@ export default function BridalBookingWizard({
           </div>
         </div>
 
-        <aside className="rounded-[2rem] border border-rosewood/10 bg-charcoal p-6 text-white shadow-panel">
+        <aside className="self-start rounded-[2rem] border border-rosewood/10 bg-charcoal p-6 text-white shadow-panel xl:sticky xl:top-28">
           <p className="text-xs uppercase tracking-[0.3em] text-white/55">Booking Summary</p>
           <div className="mt-6 space-y-4 text-sm">
-            <div className="flex items-center justify-between gap-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
               <span className="text-white/68">Package</span>
-              <span className="font-medium">{selectedPackage?.name || "--"}</span>
+              <span className="break-words text-right font-medium">{selectedPackage?.name || "--"}</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
               <span className="text-white/68">Duration</span>
-              <span className="font-medium">{selectedPackage?.duration || "--"}</span>
+              <span className="text-right font-medium">{selectedPackage?.duration || "--"}</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
               <span className="text-white/68">Location</span>
-              <span className="font-medium">
+              <span className="break-words text-right font-medium">
                 {normalizeLocationLabel(form.serviceLocation)}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
               <span className="text-white/68">Payment Status</span>
-              <span className="font-medium">
+              <span className="text-right font-medium">
                 {paymentState.success?.paymentStatus ||
                   submission.success?.paymentStatus ||
                   "PENDING"}
@@ -885,18 +883,18 @@ export default function BridalBookingWizard({
                 <p className="text-xs uppercase tracking-[0.25em] text-white/55">
                   Coupon Code
                 </p>
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col gap-3">
                   <input
                     value={couponCode}
                     onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
                     placeholder="Enter coupon code"
-                    className="flex-1 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none placeholder:text-white/35"
+                    className="w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none placeholder:text-white/35"
                   />
                   {couponState.applied ? (
                     <button
                       type="button"
                       onClick={handleRemoveCoupon}
-                      className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold"
+                      className="w-full rounded-full border border-white/15 px-5 py-3 text-sm font-semibold sm:w-auto"
                     >
                       Remove
                     </button>
@@ -905,7 +903,7 @@ export default function BridalBookingWizard({
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={couponState.loading || !couponCode.trim()}
-                      className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-charcoal disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full rounded-full bg-white px-5 py-3 text-sm font-semibold text-charcoal disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                     >
                       {couponState.loading ? "Applying..." : "Apply Coupon"}
                     </button>
@@ -922,39 +920,39 @@ export default function BridalBookingWizard({
               </div>
               {hasCoupon ? (
                 <>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                     <span className="text-white/68">Original Price</span>
-                    <span className="font-semibold">
+                    <span className="text-right font-semibold">
                       {formatCurrency(activePricing?.originalAmount || 0)}
                     </span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between gap-4">
+                  <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                     <span className="text-white/68">Coupon Code</span>
-                    <span className="font-semibold">{activePricing?.couponCode || "--"}</span>
+                    <span className="break-words text-right font-semibold">{activePricing?.couponCode || "--"}</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between gap-4">
+                  <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                     <span className="text-white/68">Discount</span>
-                    <span className="font-semibold text-emerald-300">
+                    <span className="text-right font-semibold text-emerald-300">
                       - {formatCurrency(activePricing?.discountAmount || 0)}
                     </span>
                   </div>
                 </>
               ) : null}
-              <div className="mt-3 flex items-center justify-between gap-4">
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                 <span className="text-white/68">{hasCoupon ? "Final Total" : "Total Amount"}</span>
-                <span className="font-semibold">
+                <span className="text-right font-semibold">
                   {formatCurrency(activePricing?.finalAmount || 0)}
                 </span>
               </div>
-              <div className="mt-3 flex items-center justify-between gap-4">
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                 <span className="text-white/68">Advance Required</span>
-                <span className="font-semibold text-blush">
+                <span className="text-right font-semibold text-blush">
                   {formatCurrency(activePricing?.advanceAmount || 0)}
                 </span>
               </div>
-              <div className="mt-3 flex items-center justify-between gap-4">
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                 <span className="text-white/68">Remaining Amount</span>
-                <span className="font-semibold">
+                <span className="text-right font-semibold">
                   {formatCurrency(activePricing?.remainingAmount || 0)}
                 </span>
               </div>
@@ -965,8 +963,7 @@ export default function BridalBookingWizard({
             <div className="flex items-start gap-3">
               <ShieldAlert size={18} className="mt-1 text-blush" />
               <p>
-                Backend uses MongoDB package pricing and advance percentage as authoritative
-                values. Frontend only opens verified backend payment orders.
+                Package pricing and advance amounts are confirmed before secure checkout opens, so your summary always stays accurate.
               </p>
             </div>
           </div>

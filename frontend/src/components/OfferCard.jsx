@@ -29,7 +29,7 @@ export default function OfferCard({ offer }) {
   }
 
   return (
-    <article className="rounded-[2rem] border border-rosewood/10 bg-white p-6 shadow-panel">
+    <article className="flex h-full flex-col rounded-[2rem] border border-rosewood/10 bg-white p-6 shadow-panel">
       {offer.image ? (
         <div className="mb-5 overflow-hidden rounded-[1.6rem]">
           <img
@@ -42,9 +42,9 @@ export default function OfferCard({ offer }) {
       <span className="inline-flex rounded-full bg-blush/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-plum">
         {offer.badge}
       </span>
-      <h3 className="mt-4 font-display text-3xl">{offer.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-charcoal/70">{offer.description}</p>
-      <div className="mt-5 grid gap-3 rounded-[1.5rem] bg-cream p-4 text-sm text-charcoal/72">
+      <h3 className="mt-4 min-h-[5.5rem] font-display text-3xl leading-tight">{offer.title}</h3>
+      <p className="mt-3 min-h-[4.5rem] text-sm leading-6 text-charcoal/70">{offer.description}</p>
+      <div className="mt-5 grid flex-1 gap-3 rounded-[1.5rem] bg-cream p-4 text-sm text-charcoal/72">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-charcoal/45">Coupon Code</p>
@@ -84,7 +84,7 @@ export default function OfferCard({ offer }) {
           </div>
         </div>
       </div>
-      <div className="mt-5 flex flex-wrap gap-3">
+      <div className="mt-5 flex flex-wrap gap-3 pt-1">
         <Link
           to={(offer.applicableBookingTypes || []).includes("BRIDAL") ? "/bridal" : "/services"}
           className="rounded-full bg-charcoal px-5 py-3 text-sm font-semibold text-white"

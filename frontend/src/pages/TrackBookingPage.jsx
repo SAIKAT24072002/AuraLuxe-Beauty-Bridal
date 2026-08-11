@@ -341,7 +341,7 @@ export default function TrackBookingPage() {
       <PageHero
         eyebrow="Track Booking"
         title="A guest-friendly tracking page that now reflects real payment and status events."
-        description="Booking ID and phone lookup shows backend-driven timeline, payment summary, and remaining payment action when the booking becomes eligible."
+        description="Use your booking ID and phone number to follow timing, payment progress, and service updates with clarity."
       />
       <section className="mx-auto max-w-6xl px-4 py-16 md:px-8">
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
@@ -379,7 +379,7 @@ export default function TrackBookingPage() {
               </div>
             ) : (
               <div className="mt-6 rounded-[1.5rem] bg-cream p-4 text-sm leading-6 text-charcoal/68">
-                Enter your booking ID and phone number to load live booking details from the backend.
+                Enter your booking ID and phone number to load your latest appointment or bridal booking details.
               </div>
             )}
           </div>

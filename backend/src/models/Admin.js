@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN"];
+
 const adminSchema = new mongoose.Schema(
   {
     name: {
@@ -27,7 +29,8 @@ const adminSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "SUPER_ADMIN",
+      enum: ADMIN_ROLES,
+      default: "ADMIN",
     },
     isActive: {
       type: Boolean,
@@ -55,4 +58,3 @@ adminSchema.methods.comparePassword = function comparePassword(candidatePassword
 const Admin = mongoose.model("Admin", adminSchema);
 
 export default Admin;
-

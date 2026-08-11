@@ -11,7 +11,7 @@ export default function PageHero({
   return (
     <section className="relative overflow-hidden border-b border-rosewood/10 bg-mesh">
       <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle,_rgba(166,93,99,0.16),_transparent_55%)]" />
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-20 md:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-20 md:px-8 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:py-24">
         <Reveal className="space-y-6 rounded-[2rem] border border-white/70 bg-white/72 p-6 shadow-panel backdrop-blur md:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-rosewood">
             {eyebrow}
@@ -37,20 +37,20 @@ export default function PageHero({
           <div className="rounded-[2rem] border border-white/70 bg-white/75 p-6 shadow-panel backdrop-blur">
             <p className="text-sm uppercase tracking-[0.3em] text-rosewood">Crafted Experience</p>
             <p className="mt-4 font-display text-3xl">
-              Premium UI scaffolding for bookings, bridal stories, and service discovery.
+              A calm, elegant journey from first enquiry to confirmed beauty or bridal booking.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[1.75rem] bg-charcoal p-5 text-white shadow-panel">
+            <div className="flex h-full flex-col rounded-[1.75rem] bg-charcoal p-5 text-white shadow-panel">
               <p className="text-xs uppercase tracking-[0.25em] text-white/60">Responsive</p>
               <p className="mt-3 text-sm leading-6 text-white/80">
-                Tuned for desktop, tablet, and mobile without horizontal overflow.
+                Easy to browse on desktop, tablet, and mobile while planning at your own pace.
               </p>
             </div>
-            <div className="rounded-[1.75rem] bg-gradient-to-br from-blush to-almond p-5 shadow-panel">
-              <p className="text-xs uppercase tracking-[0.25em] text-charcoal/50">Ready For API</p>
+            <div className="flex h-full flex-col rounded-[1.75rem] bg-gradient-to-br from-blush to-almond p-5 shadow-panel">
+              <p className="text-xs uppercase tracking-[0.25em] text-charcoal/50">Thoughtful Planning</p>
               <p className="mt-3 text-sm leading-6 text-charcoal/75">
-                Mock-backed sections are structured for easy data replacement later.
+                Clear package details, availability guidance, and payment clarity keep every step reassuring.
               </p>
             </div>
           </div>

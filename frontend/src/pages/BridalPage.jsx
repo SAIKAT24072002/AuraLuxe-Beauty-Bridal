@@ -20,7 +20,7 @@ export default function BridalPage() {
       <PageHero
         eyebrow="Bridal"
         title="A bridal destination shaped for storytelling, trust, and venue-ready booking confidence."
-        description="From HD bridal makeup to reception, haldi, and mehendi styling, this page introduces premium packages and the UI structure for on-location bridal planning."
+        description="From HD bridal makeup to reception, haldi, and mehendi styling, discover premium packages planned for home, venue, and celebration-ready preparation."
         primaryAction={
           <Link
             to={`/bridal/packages/${featuredPackage?.slug || "royal-bridal"}`}
@@ -40,7 +40,7 @@ export default function BridalPage() {
         <SectionHeader
           eyebrow="Bridal Services"
           title="Every wedding event has its own tone, timing, and visual finish."
-          description="The bridal service system is ready to separate event types, packages, and location-specific details cleanly."
+          description="Choose from event-specific bridal artistry shaped around ceremony mood, timing, and personal style."
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {bridalServices.map((item) => (
@@ -54,11 +54,11 @@ export default function BridalPage() {
 
       <section className="bg-cream/60">
         <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-          <SectionHeader
-            eyebrow="Bridal Packages"
-            title="Packages positioned as premium experiences, not just price cards."
-            description="Each card leads into a detail page ready for package overview, included services, and payment summary previews."
-          />
+        <SectionHeader
+          eyebrow="Bridal Packages"
+          title="Packages positioned as premium experiences, not just price cards."
+          description="Each package brings together artistry, timing, and preparation support in one clear bridal plan."
+        />
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {bridalPackages.map((item) => (
               <BridalPackageCard key={item.slug} item={item} />
@@ -94,8 +94,8 @@ export default function BridalPage() {
       <section id="bridal-booking-ui" className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <SectionHeader
           eyebrow="Booking UI"
-          title="Bridal booking is now wired to live package, availability, and MongoDB-backed confirmation flow."
-          description="Choose a package, confirm event timing, add bride and address details, and create a pending bridal booking with backend-calculated advance."
+          title="Plan your bridal date, venue details, and advance summary in one guided flow."
+          description="Choose your package, confirm the date and time, then share bride and venue details in one guided booking flow."
         />
         {createdBooking && (
           <div className="mt-8 rounded-[2rem] border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-800">
