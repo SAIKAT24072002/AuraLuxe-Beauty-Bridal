@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import AppointmentBookingWizard from "../components/AppointmentBookingWizard";
 import EmptyStateCard from "../components/EmptyStateCard";
@@ -9,11 +10,14 @@ import ServiceCard from "../components/ServiceCard";
 import { useSiteContent } from "../context/SiteContentContext";
 
 export default function ServicesPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { loading, services, serviceCategories } = useSiteContent();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedService, setSelectedService] = useState(null);
   const [createdBooking, setCreatedBooking] = useState(null);
+  const serviceIdFromQuery = searchParams.get("serviceId") || "";
 
   const filteredServices = services.filter((item) => {
     const matchesCategory =
@@ -22,6 +26,35 @@ export default function ServicesPage() {
     const matchesSearch = haystack.includes(search.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  useEffect(() => {
+    if (!serviceIdFromQuery || loading || !services.length || selectedService?.id === serviceIdFromQuery) {
+      return;
+    }
+
+    const matchedService = services.find((item) => item.id === serviceIdFromQuery);
+    if (!matchedService) {
+      return;
+    }
+
+    setSelectedService(matchedService);
+    setActiveCategory("All");
+    setSearch("");
+  }, [loading, selectedService?.id, serviceIdFromQuery, services]);
+
+  function handleSelectService(service) {
+    setSelectedService(service);
+  }
+
+  function handleCloseBooking() {
+    setSelectedService(null);
+
+    if (!serviceIdFromQuery) {
+      return;
+    }
+
+    navigate("/services", { replace: true });
+  }
 
   return (
     <div>
@@ -80,7 +113,7 @@ export default function ServicesPage() {
           <div className="mt-10">
             <AppointmentBookingWizard
               service={selectedService}
-              onClose={() => setSelectedService(null)}
+              onClose={handleCloseBooking}
               onBookingCreated={setCreatedBooking}
             />
           </div>
@@ -93,7 +126,7 @@ export default function ServicesPage() {
                 <ServiceCard
                   key={service.id}
                   service={service}
-                  onBookNow={setSelectedService}
+                  onBookNow={handleSelectService}
                 />
               ))}
         </div>

@@ -126,7 +126,11 @@ export default function HomePage() {
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {popularServices.map((service) => (
-            <ServiceCard key={service.id} service={service} />
+            <ServiceCard
+              key={service.id}
+              service={service}
+              bookingHref={`/services?serviceId=${encodeURIComponent(service.id)}`}
+            />
           ))}
         </div>
       </section>

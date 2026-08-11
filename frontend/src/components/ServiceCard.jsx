@@ -1,7 +1,11 @@
+import { Link } from "react-router-dom";
 import { Clock3, IndianRupee } from "lucide-react";
 import { optimizeCloudinaryImage } from "../utils/media";
 
-export default function ServiceCard({ service, onBookNow }) {
+export default function ServiceCard({ service, onBookNow, bookingHref }) {
+  const ctaClassName =
+    "w-full rounded-full bg-charcoal px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-rosewood";
+
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-rosewood/10 bg-white shadow-panel transition duration-300 hover:-translate-y-1 hover:shadow-glow">
       <div className="relative h-64 overflow-hidden">
@@ -29,13 +33,19 @@ export default function ServiceCard({ service, onBookNow }) {
             {service.duration}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => onBookNow?.(service)}
-          className="w-full rounded-full bg-charcoal px-5 py-3 text-sm font-semibold text-white transition hover:bg-rosewood"
-        >
-          Book Now
-        </button>
+        {bookingHref ? (
+          <Link to={bookingHref} className={ctaClassName}>
+            Book Now
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onBookNow?.(service)}
+            className={ctaClassName}
+          >
+            Book Now
+          </button>
+        )}
       </div>
     </article>
   );
