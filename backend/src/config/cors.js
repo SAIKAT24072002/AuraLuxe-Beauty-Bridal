@@ -1,4 +1,7 @@
 const DEFAULT_LOCAL_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const DEFAULT_PRODUCTION_ORIGINS = [
+  "https://aura-luxe-beauty-bridal-frontend.vercel.app",
+];
 
 function parseOrigins(value) {
   return String(value || "")
@@ -11,6 +14,7 @@ export function getAllowedOrigins() {
   return Array.from(
     new Set([
       ...DEFAULT_LOCAL_ORIGINS,
+      ...DEFAULT_PRODUCTION_ORIGINS,
       ...parseOrigins(process.env.CLIENT_URL),
       ...parseOrigins(process.env.CLIENT_URLS),
     ])
