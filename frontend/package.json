@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --configLoader runner",
     "preview": "vite preview",
     "lint": "eslint src --ext js,jsx"
   },
@@ -32,4 +32,3 @@
     "vite": "^7.1.3"
   }
 }
-
