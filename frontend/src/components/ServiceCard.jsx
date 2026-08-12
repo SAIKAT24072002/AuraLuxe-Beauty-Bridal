@@ -7,7 +7,7 @@ export default function ServiceCard({ service, onBookNow, bookingHref }) {
     "w-full rounded-full bg-charcoal px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-rosewood";
 
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-rosewood/10 bg-white shadow-panel transition duration-300 hover:-translate-y-1 hover:shadow-glow">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-rosewood/10 bg-white shadow-panel transition duration-300 hover:-translate-y-1 hover:shadow-glow">
       <div className="relative h-64 overflow-hidden">
         <img
           src={optimizeCloudinaryImage(service.image, { width: 900, height: 720, crop: "fill" })}
@@ -18,12 +18,12 @@ export default function ServiceCard({ service, onBookNow, bookingHref }) {
           {service.category}
         </span>
       </div>
-      <div className="space-y-4 p-6">
+      <div className="flex flex-1 flex-col p-6">
         <div>
           <h3 className="font-display text-3xl">{service.name}</h3>
           <p className="mt-2 text-sm leading-6 text-charcoal/70">{service.description}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-charcoal/65">
+        <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-charcoal/65">
           <span className="inline-flex items-center gap-2">
             <IndianRupee size={16} />
             {service.price.toLocaleString("en-IN")}
@@ -34,14 +34,14 @@ export default function ServiceCard({ service, onBookNow, bookingHref }) {
           </span>
         </div>
         {bookingHref ? (
-          <Link to={bookingHref} className={ctaClassName}>
+          <Link to={bookingHref} className={`${ctaClassName} mt-5`}>
             Book Now
           </Link>
         ) : (
           <button
             type="button"
             onClick={() => onBookNow?.(service)}
-            className={ctaClassName}
+            className={`${ctaClassName} mt-5`}
           >
             Book Now
           </button>
