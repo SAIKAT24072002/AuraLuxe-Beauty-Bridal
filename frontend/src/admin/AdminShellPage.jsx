@@ -3,6 +3,8 @@ import {
   Bell,
   CalendarRange,
   CreditCard,
+  Eye,
+  EyeOff,
   FolderKanban,
   GalleryVerticalEnd,
   ImagePlus,
@@ -283,6 +285,34 @@ function TextInput(props) {
   );
 }
 
+function PasswordInput({ visible, onToggle, className = "", ...props }) {
+  return (
+    <div className="relative">
+      <input
+        {...props}
+        type={visible ? "text" : "password"}
+        className={`w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 outline-none ${className}`}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-500 transition hover:text-slate-700"
+        aria-label={visible ? "Hide password" : "Show password"}
+      >
+        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
+  );
+}
+
+function PasswordRequirementHint({ className = "" }) {
+  return (
+    <p className={`text-xs leading-6 text-slate-500 ${className}`}>
+      Password must be at least 10 characters and include at least 1 uppercase, 1 lowercase, and 1 number.
+    </p>
+  );
+}
+
 function TextArea(props) {
   return (
     <textarea
@@ -459,6 +489,12 @@ export default function AdminShellPage() {
     loading: false,
     error: "",
     notice: "",
+  });
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    login: false,
+    current: false,
+    next: false,
+    confirm: false,
   });
 
   const isSuperAdmin = profile?.role === "SUPER_ADMIN";
@@ -1004,6 +1040,69 @@ export default function AdminShellPage() {
     event.preventDefault();
     if (!token) return;
 
+    if (!securityForm.currentPassword || !securityForm.newPassword || !securityForm.confirmPassword) {
+      setSecurityState({
+        loading: false,
+        error: "All password fields are required.",
+        notice: "",
+      });
+      return;
+    }
+
+    if (securityForm.newPassword !== securityForm.confirmPassword) {
+      setSecurityState({
+        loading: false,
+        error: "New password and confirm password must match.",
+        notice: "",
+      });
+      return;
+    }
+
+    if (securityForm.currentPassword === securityForm.newPassword) {
+      setSecurityState({
+        loading: false,
+        error: "New password must be different from the current password.",
+        notice: "",
+      });
+      return;
+    }
+
+    if (securityForm.newPassword.length < 10) {
+      setSecurityState({
+        loading: false,
+        error: "New password must be at least 10 characters long.",
+        notice: "",
+      });
+      return;
+    }
+
+    if (!/[A-Z]/.test(securityForm.newPassword)) {
+      setSecurityState({
+        loading: false,
+        error: "New password must include at least one uppercase letter.",
+        notice: "",
+      });
+      return;
+    }
+
+    if (!/[a-z]/.test(securityForm.newPassword)) {
+      setSecurityState({
+        loading: false,
+        error: "New password must include at least one lowercase letter.",
+        notice: "",
+      });
+      return;
+    }
+
+    if (!/\d/.test(securityForm.newPassword)) {
+      setSecurityState({
+        loading: false,
+        error: "New password must include at least one number.",
+        notice: "",
+      });
+      return;
+    }
+
     setSecurityState({ loading: true, error: "", notice: "" });
     try {
       const response = await bookingApiService.changeAdminPassword(token, securityForm);
@@ -1016,9 +1115,15 @@ export default function AdminShellPage() {
       setToken("");
       setProfile(null);
     } catch (error) {
+      const detailMessage = Array.isArray(error.response?.data?.details)
+        ? error.response.data.details[0]?.message
+        : "";
       setSecurityState({
         loading: false,
-        error: error.response?.data?.message || "Password could not be changed.",
+        error:
+          detailMessage ||
+          error.response?.data?.message ||
+          "Password could not be changed.",
         notice: "",
       });
     }
@@ -1096,8 +1201,11 @@ export default function AdminShellPage() {
                 }
                 placeholder="Admin Email"
               />
-              <TextInput
-                type="password"
+              <PasswordInput
+                visible={passwordVisibility.login}
+                onToggle={() =>
+                  setPasswordVisibility((current) => ({ ...current, login: !current.login }))
+                }
                 value={loginForm.password}
                 onChange={(event) =>
                   setLoginForm((current) => ({ ...current, password: event.target.value }))
@@ -1924,8 +2032,14 @@ export default function AdminShellPage() {
 
                         <form onSubmit={handleOwnPasswordChange} className="grid gap-4 md:grid-cols-2">
                           <Field label="Current Password">
-                            <TextInput
-                              type="password"
+                            <PasswordInput
+                              visible={passwordVisibility.current}
+                              onToggle={() =>
+                                setPasswordVisibility((current) => ({
+                                  ...current,
+                                  current: !current.current,
+                                }))
+                              }
                               value={securityForm.currentPassword}
                               onChange={(event) =>
                                 setSecurityForm((current) => ({
@@ -1937,8 +2051,14 @@ export default function AdminShellPage() {
                           </Field>
                           <div />
                           <Field label="New Password">
-                            <TextInput
-                              type="password"
+                            <PasswordInput
+                              visible={passwordVisibility.next}
+                              onToggle={() =>
+                                setPasswordVisibility((current) => ({
+                                  ...current,
+                                  next: !current.next,
+                                }))
+                              }
                               value={securityForm.newPassword}
                               onChange={(event) =>
                                 setSecurityForm((current) => ({
@@ -1949,8 +2069,14 @@ export default function AdminShellPage() {
                             />
                           </Field>
                           <Field label="Confirm Password">
-                            <TextInput
-                              type="password"
+                            <PasswordInput
+                              visible={passwordVisibility.confirm}
+                              onToggle={() =>
+                                setPasswordVisibility((current) => ({
+                                  ...current,
+                                  confirm: !current.confirm,
+                                }))
+                              }
                               value={securityForm.confirmPassword}
                               onChange={(event) =>
                                 setSecurityForm((current) => ({
@@ -1965,6 +2091,7 @@ export default function AdminShellPage() {
                               {securityState.error}
                             </div>
                           ) : null}
+                          <PasswordRequirementHint className="md:col-span-2" />
                           <div className="md:col-span-2">
                             <button
                               type="submit"
@@ -2629,11 +2756,32 @@ export default function AdminShellPage() {
             {!modal.form.id ? (
               <>
                 <Field label="Password">
-                  <TextInput type="password" value={modal.form.password || ""} onChange={(event) => updateModalForm("password", event.target.value)} />
+                  <PasswordInput
+                    visible={passwordVisibility.next}
+                    onToggle={() =>
+                      setPasswordVisibility((current) => ({
+                        ...current,
+                        next: !current.next,
+                      }))
+                    }
+                    value={modal.form.password || ""}
+                    onChange={(event) => updateModalForm("password", event.target.value)}
+                  />
                 </Field>
                 <Field label="Confirm Password">
-                  <TextInput type="password" value={modal.form.confirmPassword || ""} onChange={(event) => updateModalForm("confirmPassword", event.target.value)} />
+                  <PasswordInput
+                    visible={passwordVisibility.confirm}
+                    onToggle={() =>
+                      setPasswordVisibility((current) => ({
+                        ...current,
+                        confirm: !current.confirm,
+                      }))
+                    }
+                    value={modal.form.confirmPassword || ""}
+                    onChange={(event) => updateModalForm("confirmPassword", event.target.value)}
+                  />
                 </Field>
+                <PasswordRequirementHint className="md:col-span-2" />
               </>
             ) : (
               <div className="rounded-[1.2rem] bg-slate-50 p-4 text-sm leading-6 text-slate-600 md:col-span-2">
@@ -2649,11 +2797,32 @@ export default function AdminShellPage() {
               Reset password for <span className="font-semibold text-slate-900">{modal.form.name || "this admin"}</span>.
             </div>
             <Field label="New Password">
-              <TextInput type="password" value={modal.form.newPassword || ""} onChange={(event) => updateModalForm("newPassword", event.target.value)} />
+              <PasswordInput
+                visible={passwordVisibility.next}
+                onToggle={() =>
+                  setPasswordVisibility((current) => ({
+                    ...current,
+                    next: !current.next,
+                  }))
+                }
+                value={modal.form.newPassword || ""}
+                onChange={(event) => updateModalForm("newPassword", event.target.value)}
+              />
             </Field>
             <Field label="Confirm Password">
-              <TextInput type="password" value={modal.form.confirmPassword || ""} onChange={(event) => updateModalForm("confirmPassword", event.target.value)} />
+              <PasswordInput
+                visible={passwordVisibility.confirm}
+                onToggle={() =>
+                  setPasswordVisibility((current) => ({
+                    ...current,
+                    confirm: !current.confirm,
+                  }))
+                }
+                value={modal.form.confirmPassword || ""}
+                onChange={(event) => updateModalForm("confirmPassword", event.target.value)}
+              />
             </Field>
+            <PasswordRequirementHint />
           </div>
         ) : null}
 
